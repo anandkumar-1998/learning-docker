@@ -1,10 +1,14 @@
 const express = require('express');
 const app = express();
+require('dotenv').config({
+    path: "backend/config/config.env"
+})
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const errorMiddleware = require('./middleware/error');
 const helmet = require('helmet');
 const http = require('http');
+const { connectDatabase } = require('./config/database');
 app.use(express.json());
 app.use(cors({origin: "*"}));
 app.use(function(req, res, next){
@@ -21,8 +25,7 @@ app.use(errorMiddleware);
 
 const port = process.env.PORT || 5001;
 let server = http.createServer(app)
-
-
+connectDatabase()
 server.listen(port, ()=>{
     console.log(`Server is working on http://localhost:${port}`);
 });
