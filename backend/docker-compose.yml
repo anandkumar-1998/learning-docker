@@ -1,0 +1,17 @@
+services:
+    backend: 
+        container_name: backend
+        build: .
+        ports: 
+          - 3030:3030
+        volumes:
+          - backend:/app/public
+        restart: always
+        environment:
+          DB_IP: "localhost"
+          DB_PORT: "27017"
+          DB_BASENAME: "nidestertestingDB"
+          PORT: 3030
+
+volumes:
+    backend: {}
