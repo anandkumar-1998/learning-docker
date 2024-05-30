@@ -2,15 +2,17 @@ version: "3.8"
 
 services:
   mongo1:
-    container_name: "checking"
+    container_name: "mongo1"
     image: mongo:latest
     command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    networks:
+      - mongo-cluster
     ports:
       - 27017:27017
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}, {_id:1, host:'host.docker.internal:27018'}]}) }" | mongosh --port 27017 --quiet
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:host-gateway:27017'}, {_id:1, host:'host.docker.internal:host-gateway:27018'}]}) }" | mongosh --port 27017 --quiet
       interval: 5s
       timeout: 30s
       start_period: 0s
@@ -20,6 +22,9 @@ services:
       - "mongo1_data:/data/db"
       - "mongo1_config:/data/configdb"
   mongo2:
+    container_name: "mongo2"
+    networks:
+      - mongo-cluster
     image: mongo:latest
     command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
     ports:
@@ -29,6 +34,9 @@ services:
     volumes:
       - "mongo2_data:/data/db"
       - "mongo2_config:/data/configdb"
+networks:
+  mongo-cluster:
+    driver: bridge
 
 volumes:
   mongo1_data:
